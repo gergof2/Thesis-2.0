@@ -1,6 +1,7 @@
 const express = require('express');
 const user_model = require('../model/userModel');
 const router = express.Router();
+const bcrypt = require("bcrypt");
 
 router.post('/register', async (req, res) => {
     if(req.body.username == "" || req.body.email == "" || req.body.password == "") {
@@ -42,6 +43,7 @@ router.post('/register', async (req, res) => {
 
         const check = await user_model.checkEmail(req.body.email);
         if (check.rowCount === 0){
+            const passhash = await bcrypt.hash(req.body.password, 10);
         }
         else res.json("Email is already taken!");
     }
