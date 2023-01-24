@@ -1,7 +1,6 @@
 const express = require("express");
 const {Server} = require("socket.io");
 const helmet = require("helmet");
-const conn = require('./config/db');
 
 const app = express();
 const server = require("http").createServer(app);
