@@ -40,6 +40,10 @@ router.post('/register', async (req, res) => {
         })
     }else {
 
+        const check = await user_model.checkEmail(req.body.email);
+        if (check.rowCount === 0){
+        }
+        else res.json("Email is already taken!");
     }
 })
 
