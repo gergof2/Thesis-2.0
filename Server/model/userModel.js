@@ -7,6 +7,12 @@ class user_model{
         const response = await pool.query("SELECT username FROM users WHERE email = $1", [email]);
         return response;
     }
+
+    static async postRegister(user_name, email, passhash){
+        const response = await pool.query("INSERT INTO users(username, email, passhash, points) VALUES ($1, $2, $3, 0)", [user_name, email, passhash]);
+        return response;
+    }
+
 }
 
 module.exports = user_model;
