@@ -44,6 +44,11 @@ router.post('/register', async (req, res) => {
         const check = await user_model.checkEmail(req.body.email);
         if (check.rowCount === 0){
             const passhash = await bcrypt.hash(req.body.password, 10);
+            const registerResponse = await user_model.postRegister(req.body.username, req.body.email, passhash);
+            if(registerResponse){
+                res.json("Registration was successfull!");
+            }
+            else res.json("Something went wrong!");
         }
         else res.json("Email is already taken!");
     }
