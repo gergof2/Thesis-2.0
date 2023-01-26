@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 
 router.post('/register', async (req, res) => {
-    if(req.body.username == "" || req.body.email == "" || req.body.password == "") {
+    if(req.body.username == "" || req.body.email == "" || req.body.password == "" || req.body.dateOfBirth == "") {
         res.json({
             status: "FAILED",
             message: "There was an empty field!"
@@ -39,12 +39,12 @@ router.post('/register', async (req, res) => {
             status: "FAILED",
             message: "Password is too long!"
         })
-    }else {
+    } else {
 
         const check = await user_model.checkEmail(req.body.email);
         if (check.rowCount === 0){
             const passhash = await bcrypt.hash(req.body.password, 10);
-            const registerResponse = await user_model.postRegister(req.body.username, req.body.email, passhash);
+            const registerResponse = await user_model.postRegister(req.body.username, req.body.email, passhash, req.body.dateOfBirth);
             if(registerResponse){
                 res.json("Registration was successfull!");
             }
