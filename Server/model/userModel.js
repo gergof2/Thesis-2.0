@@ -15,6 +15,11 @@ class user_model{
         return response;
     }
 
+    static async getLogin(email){
+        const response = await pool.query("SELECT id, username, email, passhash FROM users WHERE email = $1", [email]);
+        return response;
+    }
+
 }
 
 module.exports = user_model;
