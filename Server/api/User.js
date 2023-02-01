@@ -57,7 +57,7 @@ router.post('/register', async (req, res) => {
 });
 
 router
-    .route("/login")
+    .route('/login')
     .get(async (req, res) => {
         if (req.session.user && req.session.user.username){
             res.json({ loggedIn: true, name: req.session.user.username });
@@ -88,7 +88,7 @@ router
                             email: req.body.email,
                             id: results.id,
                         };
-                        return res.json({loggedIn: true, email: req.body.email, message: "Logged in!"});
+                        return res.json({loggedIn: true, message: "Logged in!"});
                     }else {
                         return res.json({loggedIn: false, message: "Wrog e-mail address or password!" })    
                     }
@@ -98,5 +98,78 @@ router
         };
     }   
 );
+
+router.route('/profile').get(async (req, res) => {
+    if(req.session.user !== undefined){
+        const profile_data = await user_model.getProfile(req.session.user.email);
+        res.json(profile_data.rows[0]);
+    } else{
+        res.json("Can't do that without account!");
+    }
+})
+
+router.route('/changepass').post(async (req, res) => {
+    if(req.session.user !== undefined){
+        if(req.body.old_pass == '', req.body.new_pass == '', req.body.new_pass_again == ''){
+            res.json({
+                status: "FAILED",
+                message: "There was an empty field!"
+            });
+        } else if(req.body.new_pass.length < 6){
+            res.json({
+                status: "FAILED",
+                message: "Password is too short!"
+            })
+        } else if(req.body.new_pass.length > 20){
+            res.json({
+                status: "FAILED",
+                message: "Password is too long!"
+            })
+        } else if(req.body.new_pass !== req.body.new_pass_again){
+            res.json({
+                status: "FAILED",
+                message: "You need to repeate the new password correctly!"
+            })
+        } else{
+            const check_pass = await user_model.checkPass(req.session.user.email);
+            if(check_pass.rowCount > 0){
+                const isSamePass = await bcrypt.compare(
+                    req.body.old_pass, 
+                    check_pass.rows[0].passhash
+                );
+                if(isSamePass){
+                    const passhash = await bcrypt.hash(req.body.new_pass, 10);
+                    const response = await user_model.postNewPass(passhash, req.session.user.email);
+                    if(response){
+                        res.json({
+                            status: "SUCCESS",
+                            message: "Password is updated!"
+                        })
+                    } else{
+                        res.json({
+                            status: "FAILED",
+                            message: "Something went wrong!"
+                        })
+                    }
+                } else{
+                    res.json({
+                        status: "FAILED",
+                        message: "Invalid password!"
+                    })
+                }
+            } else{
+                res.json({
+                    status: "FAILED",
+                    message: "Something went wrong!"
+                })
+            }
+        }
+    } else{
+        res.json({
+            status: "FAILED",
+            message: "Can't do that without account!"
+        })     
+    }
+})
 
 module.exports = router;

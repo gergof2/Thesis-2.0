@@ -20,6 +20,10 @@ class user_model{
         return response;
     }
 
+    static async getProfile(email){
+        const response = await pool.query("SELECT id, username, email, dateOfBirth, createDate FROM users WHERE email = $1", [email]);
+        return response;
+    }
 }
 
 module.exports = user_model;
