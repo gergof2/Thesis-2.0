@@ -24,6 +24,11 @@ class user_model{
         const response = await pool.query("SELECT id, username, email, dateOfBirth, createDate FROM users WHERE email = $1", [email]);
         return response;
     }
+
+    static async checkPass(email){
+        const response = await pool.query("SELECT passhash FROM users WHERE email = $1", [email]);
+        return response;
+    }
 }
 
 module.exports = user_model;
