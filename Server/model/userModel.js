@@ -29,6 +29,12 @@ class user_model{
         const response = await pool.query("SELECT passhash FROM users WHERE email = $1", [email]);
         return response;
     }
+
+    static async postNewPass(new_pass, email){
+        const response = await pool.query("UPDATE users SET passhash = $1 WHERE email = $2", [new_pass ,email]);
+        return response;
+    }
+
 }
 
 module.exports = user_model;
